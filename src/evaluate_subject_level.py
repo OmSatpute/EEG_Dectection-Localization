@@ -1,7 +1,7 @@
 import os
 import torch
 import numpy as np
-from sklearn.metrics import accuracy_score, f1_score, recall_score, confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score, recall_score, confusion_matrix, precision_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 from src.models import CNNModel
@@ -54,10 +54,12 @@ def evaluate_subject_level(model_path, test_dir, device):
     accuracy = accuracy_score(true_labels, pred_labels)
     f1 = f1_score(true_labels, pred_labels, zero_division=0)
     recall = recall_score(true_labels, pred_labels, zero_division=0)
+    precision = precision_score(true_labels, pred_labels, zero_division=0)
     
     print("=== CNN Subject-Level Evaluation ===")
     print(f"Total Subjects Evaluated: {len(true_labels)}")
     print(f"Accuracy: {accuracy:.4f}")
+    print(f"Precision: {precision:.4f}")
     print(f"F1 Score: {f1:.4f}")
     print(f"Recall: {recall:.4f}")
     
@@ -78,7 +80,7 @@ def evaluate_subject_level(model_path, test_dir, device):
     plt.figtext(
         0.5,
         -0.02,
-        f"Accuracy: {accuracy:.4f} | F1 Score: {f1:.4f} | Recall: {recall:.4f}",
+        f"Accuracy: {accuracy:.4f} | Precision: {precision:.4f} | F1 Score: {f1:.4f} | Recall: {recall:.4f}",
         ha="center",
         fontsize=10,
     )

@@ -63,8 +63,8 @@ def select_best_band(stroke_maps, nonstroke_maps):
 # =======================
 def run_live_topomap():
 
-    stroke_folder = "data/topomap_single/stroke/stroke_01"
-    nonstroke_folder = "data/topomap_single/non_stroke/non_stroke_01"
+    stroke_folder = "data/topomap_sequence/train/stroke/stroke_01"
+    nonstroke_folder = "data/topomap_sequence/train/non_stroke/non_stroke_01"
 
     stroke_maps = load_all(stroke_folder)
     nonstroke_maps = load_all(nonstroke_folder)
@@ -137,7 +137,10 @@ def run_live_topomap():
 
             # highlight abnormal
             if i == 1:
+                import scipy.ndimage as ndimage
                 mask = np.abs(d) > np.nanpercentile(np.abs(d), 95)
+                # Remove small noise artifacts using morphological opening
+                mask = ndimage.binary_opening(mask, structure=np.ones((3,3)))
                 axes[i].contour(mask, colors='yellow', linewidths=1.5)
 
             circle = plt.Circle((32, 32), 31, color='black', fill=False)

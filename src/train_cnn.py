@@ -4,7 +4,7 @@ import torch
 import matplotlib.pyplot as plt
 import seaborn as sns
 from torch.utils.data import Dataset, DataLoader
-from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, recall_score
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, recall_score, precision_score
 from src.models import CNNModel
 
 
@@ -17,8 +17,9 @@ def save_confusion_matrix(y_true, y_pred, output_dir):
     os.makedirs(output_dir, exist_ok=True)
 
     accuracy = accuracy_score(y_true, y_pred)
-    f1 = f1_score(y_true, y_pred)
-    recall = recall_score(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred, zero_division=0)
+    recall = recall_score(y_true, y_pred, zero_division=0)
+    precision = precision_score(y_true, y_pred, zero_division=0)
     cm = confusion_matrix(y_true, y_pred)
 
     plt.figure(figsize=(6, 5))
@@ -36,7 +37,7 @@ def save_confusion_matrix(y_true, y_pred, output_dir):
     plt.figtext(
         0.5,
         -0.02,
-        f"Accuracy: {accuracy:.4f} | F1 Score: {f1:.4f} | Recall: {recall:.4f}",
+        f"Accuracy: {accuracy:.4f} | Precision: {precision:.4f} | F1 Score: {f1:.4f} | Recall: {recall:.4f}",
         ha="center",
         fontsize=10,
     )
@@ -104,10 +105,11 @@ def evaluate(model, loader, device):
             all_labels.extend(y.cpu().numpy().tolist())
 
     accuracy = accuracy_score(all_labels, all_preds)
-    f1 = f1_score(all_labels, all_preds)
-    recall = recall_score(all_labels, all_preds)
+    f1 = f1_score(all_labels, all_preds, zero_division=0)
+    recall = recall_score(all_labels, all_preds, zero_division=0)
+    precision = precision_score(all_labels, all_preds, zero_division=0)
 
-    return accuracy, f1, recall, all_labels, all_preds
+    return accuracy, f1, recall, precision, all_labels, all_preds
 
 
 # Load data
@@ -146,8 +148,8 @@ for epoch in range(15):
 
         total_loss += loss.item()
 
-    train_accuracy, train_f1, train_recall, _, _ = evaluate(model, train_loader, device)
-    val_accuracy, val_f1, val_recall, _, _ = evaluate(model, val_loader, device)
+    train_accuracy, train_f1, train_recall, train_precision, _, _ = evaluate(model, train_loader, device)
+    val_accuracy, val_f1, val_recall, val_precision, _, _ = evaluate(model, val_loader, device)
 
     train_accuracies.append(train_accuracy)
     val_accuracies.append(val_accuracy)
@@ -155,16 +157,17 @@ for epoch in range(15):
     print(
         f"Epoch {epoch+1}, Loss: {total_loss:.4f}, "
         f"Train Accuracy: {train_accuracy:.4f}, "
-        f"Val Accuracy: {val_accuracy:.4f}, Val F1: {val_f1:.4f}, Val Recall: {val_recall:.4f}"
+        f"Val Accuracy: {val_accuracy:.4f}, Val Precision: {val_precision:.4f}, Val F1: {val_f1:.4f}, Val Recall: {val_recall:.4f}"
     )
 
 save_accuracy_plot(train_accuracies, val_accuracies, CNN_OUTPUT_DIR)
 print(f"Accuracy plot saved in {CNN_OUTPUT_DIR}")
 
 # Test
-accuracy, f1, recall, all_labels, all_preds = evaluate(model, test_loader, device)
+accuracy, f1, recall, precision, all_labels, all_preds = evaluate(model, test_loader, device)
 
 print("Test Accuracy:", accuracy)
+print("Precision:", precision)
 print("F1 Score:", f1)
 print("Recall:", recall)
 
