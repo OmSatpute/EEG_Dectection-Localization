@@ -25,7 +25,7 @@ def generate_topomap_array(features, info, img_size=64):
         if i % 100 == 0:
             print(f"  Processed {i}/{len(features)}")
             
-        bands = feature.reshape(4, 26)
+        bands = feature.reshape(26, 4).T
         band_maps = []
 
         for j in range(4):
@@ -50,7 +50,7 @@ def process_single_sample(args):
     if idx % 500 == 0:
         print(f"Processing sample {idx}", flush=True)
 
-    bands = feature.reshape(4, 26)
+    bands = feature.reshape(26, 4).T
     topomap_stack = []
 
     for j in range(4):

@@ -117,7 +117,7 @@ def main():
     parser.add_argument("--data-root", default="data/topomap_sequence")
     parser.add_argument("--epochs", type=int, default=15)
     parser.add_argument("--batch-size", type=int, default=2)
-    parser.add_argument("--sequence-length", type=int, default=120)
+    parser.add_argument("--sequence-length", type=int, default=60)
     parser.add_argument("--output", default=CNN_LSTM_MODEL_PATH)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
