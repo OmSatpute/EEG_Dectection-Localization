@@ -141,6 +141,14 @@ def run_live_topomap():
                 mask = np.abs(d) > np.nanpercentile(np.abs(d), 95)
                 # Remove small noise artifacts using morphological opening
                 mask = ndimage.binary_opening(mask, structure=np.ones((3,3)))
+                
+                # Keep only the largest connected component to eliminate isolated noise
+                labeled_mask, num_features = ndimage.label(mask)
+                if num_features > 0:
+                    sizes = np.bincount(labeled_mask.flat)[1:] # Sizes of each component
+                    max_label = np.argmax(sizes) + 1
+                    mask = (labeled_mask == max_label)
+                    
                 axes[i].contour(mask, colors='yellow', linewidths=1.5)
 
             circle = plt.Circle((32, 32), 31, color='black', fill=False)
